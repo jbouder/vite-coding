@@ -16,6 +16,8 @@ import {
   Divider,
   IconButton,
   Tooltip,
+  useMediaQuery,
+  PaletteMode,
 } from "@mui/material";
 import {
   Routes,
@@ -28,7 +30,9 @@ import InfoIcon from "@mui/icons-material/Info";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import { useState } from "react";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import { useMemo, useState } from "react";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
@@ -39,8 +43,14 @@ const drawerCollapsedWidth = 65;
 
 function App() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [isDrawerCollapsed, setIsDrawerCollapsed] = useState(false);
+  const [isDrawerCollapsed, setIsDrawerCollapsed] = useState(true);
   const location = useLocation();
+
+  // Add mode state for theme toggling
+  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
+  const [mode, setMode] = useState<PaletteMode>(
+    prefersDarkMode ? "dark" : "light"
+  );
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -50,16 +60,31 @@ function App() {
     setIsDrawerCollapsed(!isDrawerCollapsed);
   };
 
-  const theme = createTheme({
-    palette: {
-      primary: {
-        main: "#556cd6",
-      },
-      secondary: {
-        main: "#19857b",
-      },
-    },
-  });
+  // Toggle between light and dark modes
+  const handleThemeToggle = () => {
+    setMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
+  };
+
+  // Create theme with mode
+  const theme = useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode,
+          primary: {
+            main: "#556cd6",
+          },
+          secondary: {
+            main: "#19857b",
+          },
+          background: {
+            default: mode === "light" ? "#f5f5f5" : "#121212",
+            paper: mode === "light" ? "#ffffff" : "#1e1e1e",
+          },
+        },
+      }),
+    [mode]
+  );
 
   const drawer = (
     <>
@@ -132,6 +157,33 @@ function App() {
             </ListItemButton>
           </Tooltip>
         </ListItem>
+        <Divider sx={{ my: 1 }} />
+        <ListItem disablePadding>
+          <Tooltip
+            title={isDrawerCollapsed ? "Toggle Dark Mode" : ""}
+            placement="right"
+          >
+            <ListItemButton
+              onClick={handleThemeToggle}
+              sx={{
+                minHeight: 48,
+                justifyContent: isDrawerCollapsed ? "center" : "initial",
+                px: 2.5,
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  minWidth: 0,
+                  mr: isDrawerCollapsed ? "auto" : 3,
+                  justifyContent: "center",
+                }}
+              >
+                {mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
+              </ListItemIcon>
+              {!isDrawerCollapsed && <ListItemText primary="Dark Mode" />}
+            </ListItemButton>
+          </Tooltip>
+        </ListItem>
       </List>
     </>
   );
@@ -169,6 +221,15 @@ function App() {
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               Vibe Coding
             </Typography>
+
+            {/* App Bar Theme Toggle Button */}
+            <IconButton
+              sx={{ ml: 1 }}
+              onClick={handleThemeToggle}
+              color="inherit"
+            >
+              {mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
+            </IconButton>
           </Toolbar>
         </AppBar>
 
@@ -234,7 +295,7 @@ function App() {
           component="main"
           sx={{
             flexGrow: 1,
-            p: 3,
+            p: 0,
             width: { sm: `calc(100% - ${currentDrawerWidth}px)` },
             transition: theme.transitions.create(["margin", "width"], {
               easing: theme.transitions.easing.sharp,
@@ -245,26 +306,17 @@ function App() {
             height: "calc(100vh - 64px)", // Subtract the AppBar height
             overflowY: "auto", // Allow content to scroll if needed
             display: "block", // Using block instead of flex to avoid flex behaviors
-            backgroundColor: "#0a0a2a", // Dark blue background for space effect
-            backgroundImage: `
-              radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px), 
-              radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
-              radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px),
-              radial-gradient(rgba(255,255,255,.4), rgba(255,255,255,.1) 1px, transparent 2px)
-            `,
-            backgroundSize:
-              "550px 550px, 350px 350px, 250px 250px, 150px 150px",
-            backgroundPosition: "0 0, 40px 60px, 130px 270px, 70px 100px",
-            color: "white", // Text color to contrast with dark background
+            position: "relative",
           }}
         >
           <Box
             sx={{
-              backgroundColor: "rgba(255, 255, 255, 0.9)",
-              borderRadius: 1,
-              p: 3,
-              color: "text.primary", // Reset text color for content
-              boxShadow: 1,
+              height: "100%",
+              width: "100%",
+              boxSizing: "border-box",
+              position: "relative",
+              zIndex: 1,
+              p: 3, // Add some padding to the content
             }}
           >
             <Routes>

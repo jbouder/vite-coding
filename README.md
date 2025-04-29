@@ -19,11 +19,20 @@ Update the sidebar so that it can be toggled between full, and just the icons wh
 
 # Update Content
 Remove the cards and their content from the home and about us pages
+
 Replace the content on the about us page with content about how we love to vibe code
 
 # Update Styling
 Update to justify the main content to the top, instead of the middle
-Add a scrolling marquee to the homepage that says Under Construction
-Update the main content area with a background of pixelated repeating stars
 
+Add a scrolling marquee to the homepage that says Under Construction
+
+Update the app with a dark mode theme
+
+# Bonus
+Add Vitest to the app and add unit tests for 80% coverage
+
+Replace MUI with AntD and update all applicable components and styling
+
+Add Playwright to the app and add a basic test for loading the homepage, navigating to the about us page, and verifying content
 ```
